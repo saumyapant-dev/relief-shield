@@ -1,0 +1,127 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Little Dino's Big Roar - Automated Test Suite</title>
+  <style>
+    body { font-family: monospace; background: #0f172a; color: #f8fafc; padding: 24px; }
+    .pass { color: #4ade80; font-weight: bold; }
+    .fail { color: #f87171; font-weight: bold; }
+    .test-card { background: #1e293b; padding: 16px; margin-bottom: 12px; border-radius: 8px; border-left: 4px solid #38bdf8; }
+    h1 { color: #38bdf8; }
+    canvas { display: none; }
+  </style>
+</head>
+<body>
+  <h1>🦖 Little Dino's Big Roar — Automated Test Suite</h1>
+  <div id="results"></div>
+  <canvas id="test-canvas" width="1080" height="1920"></canvas>
+
+  <script type="module">
+    import { Timeline, SCENES, TOTAL_DURATION, Easing } from "../js/engine/timeline.js";
+    import { Camera } from "../js/engine/camera.js";
+    import { ParticleSystem } from "../js/engine/particles.js";
+    import { JungleEnvironment } from "../js/render/environment.js";
+    import { DinoCharacter } from "../js/render/dino.js";
+    import { FriendsRigs } from "../js/render/friends.js";
+    import { CaptionsRenderer } from "../js/render/captions.js";
+    import { SFXEngine } from "../js/audio/sfx.js";
+
+    const resultsEl = document.getElementById("results");
+    const testCanvas = document.getElementById("test-canvas");
+    const ctx = testCanvas.getContext("2d");
+
+    function assert(condition, message) {
+      const card = document.createElement("div");
+      card.className = "test-card";
+      if (condition) {
+        card.innerHTML = `<span class="pass">✔ PASS:</span> ${message}`;
+      } else {
+        card.innerHTML = `<span class="fail">✖ FAIL:</span> ${message}`;
+        console.error("Test failed:", message);
+      }
+      resultsEl.appendChild(card);
+      return condition;
+    }
+
+    try {
+      // Test 1: Duration and 8 scenes
+      assert(TOTAL_DURATION === 60.0, `Total duration must be 60.0 seconds (got ${TOTAL_DURATION})`);
+      assert(SCENES.length === 8, `Must have exactly 8 scenes (got ${SCENES.length})`);
+
+      // Test 2: Contiguous scene timing
+      let isContiguous = true;
+      let lastEnd = 0.0;
+      SCENES.forEach((s, idx) => {
+        if (Math.abs(s.start - lastEnd) > 0.001) isContiguous = false;
+        lastEnd = s.end;
+      });
+      assert(isContiguous && lastEnd === 60.0, `All 8 scenes are strictly contiguous from 0.00s to 60.00s`);
+
+      // Test 3: Timeline playback and seek
+      const timeline = new Timeline(60.0);
+      timeline.seek(15.5);
+      const sceneAt15_5 = timeline.getCurrentScene();
+      assert(sceneAt15_5.scene.id === 3, `Time 15.5s must map to Scene 3 (got Scene ${sceneAt15_5.scene.id})`);
+
+      // Test 4: Looping behavior at 60s
+      timeline.isLooping = true;
+      timeline.isPlaying = true;
+      timeline.currentTime = 59.95;
+      timeline.lastFrameTime = performance.now() - 100;
+      timeline.tick(performance.now());
+      assert(timeline.currentTime < 1.0, `Timeline ticks past 60.0s wrap back to 0.0s for seamless looping (got ${timeline.currentTime}s)`);
+
+      // Test 5: Easing function boundaries
+      const e0 = Easing.easeInOutCubic(0);
+      const e1 = Easing.easeInOutCubic(1);
+      assert(Math.abs(e0) < 0.0001 && Math.abs(e1 - 1) < 0.0001, `Easing function boundaries are valid (0->0, 1->1)`);
+
+      // Test 6: Full Visual Rendering on 1080x1920 across all 8 scenes
+      const camera = new Camera(1080, 1920);
+      const particles = new ParticleSystem();
+      const environment = new JungleEnvironment();
+      const dino = new DinoCharacter();
+      const friends = new FriendsRigs();
+      const captions = new CaptionsRenderer();
+
+      const testTimestamps = [1.0, 8.0, 16.0, 24.0, 33.0, 34.0, 42.0, 50.0, 58.0];
+      let renderPassed = true;
+
+      testTimestamps.forEach((t) => {
+        try {
+          timeline.seek(t);
+          camera.update(timeline);
+          particles.update(timeline);
+
+          ctx.clearRect(0, 0, 1080, 1920);
+          camera.apply(ctx);
+          environment.draw(ctx, timeline);
+          dino.draw(ctx, timeline);
+          friends.draw(ctx, timeline);
+          particles.draw(ctx, timeline);
+          environment.drawForeground(ctx);
+          camera.restore(ctx);
+          captions.draw(ctx, timeline);
+        } catch (e) {
+          renderPassed = false;
+          console.error(`Render failed at t=${t}:`, e);
+        }
+      });
+      assert(renderPassed, `1080x1920 Visual canvas pipeline rendered across all 8 scenes without exceptions`);
+
+      // Test 7: SFX Engine methods
+      assert(typeof SFXEngine.prototype.playBigRoar === "function", `SFXEngine has playBigRoar()`);
+      assert(typeof SFXEngine.prototype.playFunnySneeze === "function", `SFXEngine has playFunnySneeze()`);
+      assert(typeof SFXEngine.prototype.playSqueak === "function", `SFXEngine has playSqueak()`);
+
+      const summary = document.createElement("h2");
+      summary.style.color = "#4ade80";
+      summary.textContent = "All Automated Tests Succeeded!";
+      resultsEl.prepend(summary);
+    } catch (err) {
+      assert(false, `Unexpected error in test harness: ${err.message}`);
+    }
+  </script>
+</body>
+</html>

@@ -1,0 +1,22 @@
+{
+  "name": "relief-shield",
+  "version": "1.0.0",
+  "description": "Relief Shield - Real-time disaster relief coordination platform",
+  "private": true,
+  "scripts": {
+    "server": "npm --prefix server run dev",
+    "client": "npm --prefix client run dev",
+    "install:all": "npm --prefix server install && npm --prefix client install",
+    "seed": "npm --prefix server run seed"
+  },
+  "keywords": [
+    "disaster-relief",
+    "express",
+    "react",
+    "mongodb",
+    "socket.io",
+    "geospatial"
+  ],
+  "author": "",
+  "license": "ISC"
+}

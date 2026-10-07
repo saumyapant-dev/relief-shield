@@ -1,0 +1,178 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Little Dino's Big Roar — 60s Animated Nursery Rhyme</title>
+  
+  <!-- Preschool friendly rounded typography -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Fredoka:wght@400;600;700&family=Nunito:wght@400;600;700;800;900&display=swap" rel="stylesheet">
+  
+  <link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+
+  <!-- Top Studio Header -->
+  <header class="app-header">
+    <div class="logo-group">
+      <div class="logo-badge">🦕</div>
+      <div class="header-title">
+        <h1>Little Dino's Big Roar</h1>
+        <div class="header-subtitle">60-Second Animated Musical YouTube Short • 1080 × 1920 (9:16)</div>
+      </div>
+    </div>
+    <div class="header-actions">
+      <span class="badge-tag">👶 Ages 2–5 Preschool</span>
+      <span class="badge-tag">🔁 Seamless Loop</span>
+      <button id="btn-toggle-safe-area" class="btn-secondary" title="Toggle YouTube Shorts Safe Margins Overlay">
+        📐 Safe Margins
+      </button>
+    </div>
+  </header>
+
+  <!-- Main Animation Studio Workspace -->
+  <main class="studio-main">
+    
+    <!-- Left Column: 9:16 YouTube Shorts Mockup Frame -->
+    <section class="preview-pane">
+      <div class="phone-mockup">
+        <div class="canvas-wrapper">
+          <!-- Logical 1080x1920 Rendering Canvas -->
+          <canvas id="video-canvas" width="1080" height="1920"></canvas>
+          
+          <!-- YouTube Shorts Mock UI Elements -->
+          <div class="shorts-overlay">
+            <div class="shorts-header-badge">SHORTS</div>
+            
+            <div class="shorts-side-actions">
+              <div class="shorts-side-btn">
+                <span>❤️</span>
+                <span>48K</span>
+              </div>
+              <div class="shorts-side-btn">
+                <span>💬</span>
+                <span>1.2K</span>
+              </div>
+              <div class="shorts-side-btn">
+                <span>↗️</span>
+                <span>Share</span>
+              </div>
+              <div class="shorts-side-btn">
+                <span>🎵</span>
+                <span>Remix</span>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- Right Column: Animation Controller, Timeline, Audio Mixer & Export -->
+    <section class="controls-pane">
+
+      <!-- 1. Playback & Timeline Scrubber Card -->
+      <div class="control-card">
+        <div class="card-header">
+          <div class="card-title">
+            <span>⏱️</span>
+            <span>Playback & Timeline</span>
+          </div>
+          <div id="time-display" class="time-row">00:00.0 / 01:00</div>
+        </div>
+
+        <div class="timeline-scrubber-box">
+          <div class="seek-track-wrapper">
+            <input type="range" id="seek-bar" class="seek-slider" min="0" max="100" step="0.1" value="0">
+          </div>
+        </div>
+
+        <div class="transport-buttons-row">
+          <button id="btn-play" class="btn-primary">
+            <svg width="24" height="24" viewBox="0 0 24 24" fill="currentColor">
+              <polygon points="6,4 20,12 6,20"/>
+            </svg>
+            <span>Play</span>
+          </button>
+
+          <button id="btn-restart" class="btn-secondary">
+            <span>🔄</span>
+            <span>Restart</span>
+          </button>
+
+          <button id="btn-export" class="btn-export">
+            <span>📹</span>
+            <span>Export 1080×1920 Video</span>
+          </button>
+        </div>
+      </div>
+
+      <!-- 2. Scene Quick-Jump Navigator Card -->
+      <div class="control-card">
+        <div class="card-header">
+          <div class="card-title">
+            <span>🎬</span>
+            <span>8-Scene Storyline Navigator</span>
+          </div>
+        </div>
+        <div id="scene-pills" class="scene-pills-grid">
+          <!-- Dynamically populated scene buttons (1 to 8) -->
+        </div>
+      </div>
+
+      <!-- 3. Audio & Music Mixer Card -->
+      <div class="control-card">
+        <div class="card-header">
+          <div class="card-title">
+            <span>🎶</span>
+            <span>Audio & Music Mixer</span>
+          </div>
+        </div>
+        <div class="audio-controls-row">
+          <div class="volume-control">
+            <span>🔊 Master:</span>
+            <input type="range" id="slider-volume" min="0" max="1" step="0.05" value="0.9" class="seek-slider">
+          </div>
+          <button id="btn-toggle-music" class="audio-toggle-btn active">🎵 116 BPM Music</button>
+          <button id="btn-toggle-vocals" class="audio-toggle-btn active">🎤 Sing-Along Vocals</button>
+          <button id="btn-toggle-sfx" class="audio-toggle-btn active">🔔 Cartoon SFX</button>
+        </div>
+      </div>
+
+      <!-- 4. Active Storyline & Lyrics Card -->
+      <div class="control-card script-preview-card">
+        <div id="active-scene-name" class="active-scene-title">Scene 1: The Hook</div>
+        <div id="active-lyrics-text" class="active-lyrics">
+          Little Dino wants to roar, — But what comes out? A squeak once more!
+        </div>
+      </div>
+
+    </section>
+
+  </main>
+
+  <!-- Video Export Progress Modal -->
+  <div id="export-modal" class="modal-backdrop">
+    <div class="modal-dialog">
+      <div class="modal-icon">🎬</div>
+      <h3 class="modal-title">Rendering 60s Video</h3>
+      <p class="modal-desc">Recording full 1080 × 1920 canvas, synchronized nursery rhyme music, singing vocals, and sound effects...</p>
+      
+      <div class="progress-track">
+        <div id="export-progress-fill" class="progress-fill"></div>
+      </div>
+      <div id="export-progress-text" class="progress-status-text">Recording 0% (0.0s / 60.0s)</div>
+
+      <button id="btn-export-cancel" class="btn-secondary">Cancel Export</button>
+    </div>
+  </div>
+
+  <footer class="app-footer">
+    Little Dino's Big Roar • 60-Second Animated Musical YouTube Short • Built with HTML5 Canvas, Web Audio API & CSS
+  </footer>
+
+  <!-- App Entrypoint -->
+  <script type="module" src="js/app.js"></script>
+</body>
+</html>
