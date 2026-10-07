@@ -1,0 +1,27 @@
+services:
+  - type: web
+    name: relief-shield-api
+    runtime: node
+    plan: free
+    rootDir: server
+    buildCommand: npm install
+    startCommand: node src/server.js
+    envVars:
+      - key: PORT
+        value: 10000
+      - key: NODE_ENV
+        value: production
+      - key: JWT_SECRET
+        generateValue: true
+      - key: MONGODB_URI
+        sync: false
+      - key: CLIENT_URL
+        sync: false
+      - key: CLOUDINARY_CLOUD_NAME
+        value: placeholder_cloud_name
+      - key: CLOUDINARY_API_KEY
+        value: placeholder_api_key
+      - key: CLOUDINARY_API_SECRET
+        value: placeholder_api_secret
+      - key: GOOGLE_MAPS_API_KEY
+        value: placeholder_google_maps_api_key
